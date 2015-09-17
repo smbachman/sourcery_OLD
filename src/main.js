@@ -1,5 +1,4 @@
-export function greet(name) {
-    alert(`Hello, ${name}`);
-}
+import React from 'react';
+import Shell from './ui/shell';
 
-greet('World');
+React.render(<Shell name="John" />, document.getElementById('ui'));

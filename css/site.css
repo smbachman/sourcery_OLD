@@ -1,0 +1,82 @@
+html {
+    height: 100%
+}
+
+body {  
+  height: 100%;
+  overflow-y: hidden;
+  margin: 0px;
+}
+
+.prompt {  
+  float: left; 
+}
+
+.error, .fail {
+  color: #ee2b00;
+}
+
+.pass {
+  color: #00ee00;  
+}
+
+.secondary {
+  font-size: 80%;
+  color: #989892;
+}
+
+#output {
+  
+}
+
+.CodeMirror {
+  font-family: Monaco, Consolas, "Courier New", Courier, monospace;
+  height: auto;
+}
+
+.CodeMirror-scroll {
+    height: auto;
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
+
+.repl-panel {
+  font-family: Monaco, Consolas, "Courier New", Courier, monospace;
+  background: #141414; 
+  color: #f7f7f7;
+}
+.content, .repl {
+  height: 100%;
+}
+
+.repl-panel {
+  height: calc(100% - 37px);
+  overflow-y: auto;  
+}
+
+.repl .button-bar {
+  display: block;
+    max-width: 678px;
+  margin-left: auto;  
+  margin-right: auto;  
+}
+
+.button-bar button {
+  background: #8f9d6a;
+  color: #f7f7f7;
+  padding: 10px;
+  border: none;
+  width: calc((100% - 26px) / 3);
+  max-width: 200px;
+  margin: 1px;
+}
+
+#busy-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;    
+    background-color: #141414;    
+    z-index: 9998;
+}
