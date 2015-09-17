@@ -1,9 +1,12 @@
 import React from 'react';
+import Repl from './repl';
 
-let Shell = React.createClass({
+export default React.createClass({
 	render: function () {
-		return (<div>Hello {this.props.name}</div>);
+    return (
+      <div>
+        <Repl />
+      </div>
+    );
 	}
 });
-
-export default Shell;
