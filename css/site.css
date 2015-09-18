@@ -10,6 +10,8 @@ body {
 
 .prompt {  
   float: left; 
+  font-family: Monaco, Consolas, "Courier New", Courier, monospace;  
+  padding-top: 3px;
 }
 
 .error, .fail {

@@ -25,7 +25,7 @@ export default React.createClass({
             dangerouslySetInnerHTML: {__html: it}});
         })),
       React.createElement('div', null,
-        React.createElement('span', {style: {float: 'left'}}, '> '),
+        React.createElement('span', {className: 'prompt'}, '> '),
         React.createElement('textarea', {
           ref: 'editor',
           autoFocus: true,

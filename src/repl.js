@@ -1,137 +1,46 @@
-import CodeMirror from "codemirror";
-import "codemirror/mode/javascript/javascript";
-import "codemirror/addon/runmode/runmode";
+import config from './sourceryConfig';
+import githubDb from 'js-github/mixins/github-db';
+import createTree from 'js-git/mixins/create-tree';
+import addCache from 'js-git/mixins/add-cache';
+import memCache from 'js-git/mixins/mem-cache';
+import readCombiner from 'js-git/mixins/read-combiner';
+import formats from 'js-git/mixins/formats';
+import indexedDb from 'js-git/mixins/indexed-db';
+import run from 'gen-run';
 
-let history = [];
-let historyPointer = -1;
+let repo = {};
 
-let editor = CodeMirror.fromTextArea(document.getElementById('input'), {
-	mode: 'text/javascript',
-	theme: 'twilight',
-	extraKeys: {
-		Enter: submit,
-		Up: backHistory,
-		Down: forwardHistory
-	}
+githubDb(repo, config.repository, config.token);
+createTree(repo);
+//addCache(repo, indexedDb);
+memCache(repo);
+readCombiner(repo);
+formats(repo);
+
+run(function* () {
+  let headHash = yield repo.readRef('refs/heads/master');
+  let commit = yield repo.loadAs('commit', headHash);
+  let tree = yield repo.loadAs('tree', commit.tree);
+  let entry = tree['README.md'];
+  let readme = yield repo.loadAs("text", entry.hash);
+  console.log(readme);
+  // let updates = [
+  //   {
+  //     path: "README.md",
+  //     mode: entry.mode,
+  //     content: readme.toUpperCase()
+  //   }
+  // ];
+  // updates.base = commit.tree;
+  // let treeHash = yield repo.createTree(updates);
+  // let commitHash = yield repo.saveAs("commit", {
+  //   tree: treeHash,
+  //   author: {
+  //     name: "Scott Bachman",
+  //     email: "scott.bachman@gmail.com"
+  //   },
+  //   parent: headHash,
+  //   message: "Change README.md to be all uppercase using js-github"
+  // });
+  // yield repo.updateRef("refs/heads/master", commitHash);
 });
-
-document.getElementById('busy-mask').style.display = 'none';
-
-function submit() {
-	var input = editor.getValue();
-  	if (isBalanced(input)) {
-    	historyPointer = history.push(input);		                                      
-      	outputLine("> " + input);
-		let result = eval(input);
-        outputLine(result);
-		editor.focus();
-		editor.setValue('');		                           
-  	} else {
-   		return CodeMirror.Pass;
-  	}
-}
-
-function backHistory() {
-  if (historyPointer > 0) {                            
-      var input = history[--historyPointer];                            
-      if (input) editor.setValue(input);
-  }
-}
-
-function forwardHistory() {
-  if (historyPointer < history.length - 1) {
-      var input = history[++historyPointer];
-      editor.setValue(input);
-  } else {
-      editor.setValue("");
-  }
-}
-
-function outputLine(line, dontHighlight) {
-    line = line+'';
-    var pre = '', post = '';
-    if (!dontHighlight) {
-        var highlighted = document.createElement('div');
-        CodeMirror.runMode(line, 'text/javascript', highlighted);            
-    }
-    document.getElementById('output').innerHTML += pre + (highlighted ? highlighted.innerHTML : line) + post + "</br>";
-    //var content = document.getElementById('repl-panel');
-    //content.scrollTop = content.scrollHeight - content.offsetHeight;
-}
-
-function outputError(message, url, line) {
-    var errorLine = "<span class=\"error\">" + message;
-    if (url && line) 
-        errorLine += "<span class=\"secondary\">url: <i>" + url + "</i> line: <i>" + line + "</i></span></span>";
-    outputLine(errorLine, true);
-}
-
-window.onerror = outputError;
-
-function isBalanced(code) {
-    var length = code.length;
-    var delimiter = '';
-    var brackets = [];
-    var matching = {
-        ')': '(',
-        ']': '[',
-        '}': '{'
-    };
-
-    for (var i = 0; i < length; i++) {
-        var char = code.charAt(i);
-
-        switch (delimiter) {
-        case "'":
-        case '"':
-        case '/':
-            switch (char) {
-            case delimiter:
-                delimiter = "";
-                break;
-            case "\\":
-                i++;
-            }
-
-            break;
-        case "//":
-            if (char === "\n") delimiter = "";
-            break;
-        case "/*":
-            if (char === "*" && code.charAt(++i) === "/") delimiter = "";
-            break;
-        default:
-            switch (char) {
-            case "'":
-            case '"':
-                delimiter = char;
-                break;
-            case "/":
-                var lookahead = code.charAt(++i);
-                delimiter = char;
-
-                switch (lookahead) {
-                case "/":
-                case "*":
-                    delimiter += lookahead;
-                }
-
-                break;
-            case "(":
-            case "[":
-            case "{":
-                brackets.push(char);
-                break;
-            case ")":
-            case "]":
-            case "}":
-                if (!brackets.length || matching[char] !== brackets.pop()) {
-                    repl.print(new SyntaxError("Unexpected closing bracket: '" + char + "'"), "error");
-                    return null;
-                }
-            }
-        }
-    }
-
-    return brackets.length ? false : true;
-};
