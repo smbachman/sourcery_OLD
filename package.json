@@ -23,7 +23,7 @@
       "test": "test"
     },
     "dependencies": {
-      "codemirror": "npm:codemirror@^5.6.0",
+      "codemirror": "npm:codemirror@^5.7.0",
       "react": "npm:react@^0.13.3",
       "react-codemirror": "npm:react-codemirror@^0.1.5"
     },
